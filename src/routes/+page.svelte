@@ -9,9 +9,9 @@
 		Circuit Simulator
 	</div>
 	<div class="main-window">
-		<Picker />
-		<Graph />
-		<CircuitLayout />
+		<Picker --flex={"0 0 200px"}/>
+		<CircuitLayout --flex={"2"}/>
+		<Graph --flex={"1"}/>
 	</div>
 </main>
 
