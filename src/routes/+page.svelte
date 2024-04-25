@@ -2,6 +2,15 @@
 	import Picker from "$lib/Picker.svelte";
 	import Graph from "$lib/Graph.svelte";
 	import CircuitLayout from "$lib/CircuitLayout.svelte";
+    import type { Component } from "$lib/types";
+
+	function pickedComponent(e: CustomEvent): void {
+		let component: Component = e.detail.component;
+		
+		createComponent(component);
+	}
+
+	let createComponent: (c: Component) => void;
 </script>
 
 <main>
@@ -9,8 +18,8 @@
 		Circuit Simulator
 	</div>
 	<div class="main-window">
-		<Picker --flex={"0 0 200px"}/>
-		<CircuitLayout --flex={"2"}/>
+		<Picker on:picked={pickedComponent} --flex={"0 0 200px"}/>
+		<CircuitLayout bind:createComponent={createComponent} --flex={"2"}/>
 		<Graph --flex={"1"}/>
 	</div>
 </main>
