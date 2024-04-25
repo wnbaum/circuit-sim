@@ -17,7 +17,7 @@
 <main>
 	<div class="window">
 		{#each components as component, i}
-			<CircuitComponent component={component}/>
+			<CircuitComponent component={component.component}/>
 		{/each}
 	</div>
 </main>
