@@ -28,10 +28,6 @@
 		let height: number = endY - startY;
 		return Math.atan2(height,width);
 	}
-
-	export function updateBounds() {
-		
-	}
 </script>
 
 <main>

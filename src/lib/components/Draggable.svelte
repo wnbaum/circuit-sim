@@ -1,6 +1,13 @@
 <script lang="ts">
+    import { onMount } from "svelte";
+
+	let main: HTMLElement;
+
 	export let x: number = 0;
 	export let y: number = 0;
+
+	let width: number;
+	let height: number;
 
 	export let snap: number = 20;
 
@@ -12,6 +19,12 @@
 	let startY: number = 0;
 
 	let moving = false;
+
+	onMount(() => {
+		let rect: DOMRect = main.getBoundingClientRect();
+		width = rect.width;
+		height = rect.height;
+	});
 
 	function onMouseDown(e: MouseEvent) {
 		moving = true;
@@ -27,9 +40,9 @@
 			y = e.clientY - startMouseY + startY;
 
 			// bounds check
-			if (x > bounds.width) x = bounds.width;
+			if (x+width > bounds.width) x = bounds.width-width;
 			if (x < 0) x = 0;
-			if (y > bounds.height) y = bounds.height;
+			if (y+height > bounds.height) y = bounds.height-height;
 			if (y < 0) y = 0;
 
 			x = Math.round(x/snap)*snap;
@@ -43,13 +56,15 @@
 </script>
 
 <!-- svelte-ignore a11y-no-static-element-interactions -->
-<div
+<!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
+<main
+	bind:this={main}
 	on:mousedown={onMouseDown}
 	style="left: {x}px; top: {y}px;"
 	class="draggable"
 >
 	<slot />
-</div>
+</main>
 
 <svelte:window on:mouseup={onMouseUp} on:mousemove={onMouseMove} />
 
