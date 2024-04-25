@@ -1,25 +1,45 @@
 <script lang="ts">
-	export let x = 0;
-	export let y = 0;
+	export let x: number = 0;
+	export let y: number = 0;
+
+	export let snap: number = 20;
+
+	export let bounds: DOMRect;
+
+	let startMouseX: number = 0;
+	let startMouseY: number = 0;
+	let startX: number = 0;
+	let startY: number = 0;
 
 	let moving = false;
 
-	function onMouseDown() {
+	function onMouseDown(e: MouseEvent) {
 		moving = true;
+		startMouseX = e.clientX;
+		startMouseY = e.clientY;
+		startX = x;
+		startY = y;
 	}
 
 	function onMouseMove(e: MouseEvent) {
 		if (moving) {
-			x += e.movementX;
-			y += e.movementY;
+			x = e.clientX - startMouseX + startX;
+			y = e.clientY - startMouseY + startY;
+
+			// bounds check
+			if (x > bounds.width) x = bounds.width;
+			if (x < 0) x = 0;
+			if (y > bounds.height) y = bounds.height;
+			if (y < 0) y = 0;
+
+			x = Math.round(x/snap)*snap;
+			y = Math.round(y/snap)*snap;
 		}
 	}
 
 	function onMouseUp() {
 		moving = false;
 	}
-
-	// 	$: console.log(moving);
 </script>
 
 <!-- svelte-ignore a11y-no-static-element-interactions -->
@@ -36,8 +56,7 @@
 <style>
 	.draggable {
 		user-select: none;
-		cursor: move;
-		border: solid 1px gray;
+		cursor: pointer;
 		position: absolute;
 	}
 </style>
