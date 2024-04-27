@@ -1,13 +1,22 @@
 <script lang="ts">
 	import { createEventDispatcher } from "svelte";
-	import type { Component } from "$lib/types";
+	import { ComponentType, type Component } from "$lib/types";
 
 	let components: Component[] = [
 		{
 			name: "Battery",
+			type: ComponentType.Voltage,
+			data: { "voltage": 5 }
+		},
+		{
+			name: "Resistor",
+			type: ComponentType.Resistor,
+			data: { "resistance": 10 }
 		},
 		{
 			name: "Capacitor",
+			type: ComponentType.Capacitor,
+			data: { "capacitance": 5 }
 		},
 	];
 

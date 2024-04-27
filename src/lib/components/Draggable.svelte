@@ -1,5 +1,6 @@
 <script lang="ts">
-    import { onMount } from "svelte";
+    import { onMount, type EventDispatcher } from "svelte";
+	import { createEventDispatcher } from "svelte";
 
 	let main: HTMLElement;
 
@@ -15,8 +16,8 @@
 
 	let startMouseX: number = 0;
 	let startMouseY: number = 0;
-	let startX: number = 0;
-	let startY: number = 0;
+	let startX: number;
+	let startY: number;
 
 	let moving = false;
 
@@ -24,14 +25,15 @@
 		let rect: DOMRect = main.getBoundingClientRect();
 		width = rect.width;
 		height = rect.height;
+
+		startX = x;
+		startY = y
 	});
 
 	function onMouseDown(e: MouseEvent) {
 		moving = true;
 		startMouseX = e.clientX;
 		startMouseY = e.clientY;
-		startX = x;
-		startY = y;
 	}
 
 	function onMouseMove(e: MouseEvent) {
@@ -50,8 +52,17 @@
 		}
 	}
 
+	let dispatch = createEventDispatcher();
+
 	function onMouseUp() {
 		moving = false;
+
+		if (startX != x || startY != y) {
+			dispatch("moved");
+		}
+
+		startX = x;
+		startY = y;
 	}
 </script>
 
@@ -61,7 +72,6 @@
 	bind:this={main}
 	on:mousedown={onMouseDown}
 	style="left: {x}px; top: {y}px;"
-	class="draggable"
 >
 	<slot />
 </main>
@@ -69,7 +79,7 @@
 <svelte:window on:mouseup={onMouseUp} on:mousemove={onMouseMove} />
 
 <style>
-	.draggable {
+	main {
 		user-select: none;
 		cursor: pointer;
 		position: absolute;

@@ -1,3 +1,11 @@
+export enum ComponentType {
+	Voltage,
+	Resistor,
+	Capacitor
+}
+
 export interface Component {
-	name: String;
+	name: string;
+	type: ComponentType;
+	data: any;
 }

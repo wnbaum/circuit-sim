@@ -8,5 +8,6 @@
 		height: 20px;
 		border-radius: 20px;
 		background-color: red;
+		user-select: none;
 	}
 </style>
