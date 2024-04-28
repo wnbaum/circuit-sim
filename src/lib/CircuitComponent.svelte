@@ -34,9 +34,9 @@
 </script>
 
 <main>
-	<div class="line" style="position: absolute; width: {wireLength}px; left: 10px; top: 8px; transform: translate({startX}px, {startY}px) translateX({-wireLength/2}px) rotate({wireAngle}rad) translateX({wireLength/2}px);">
+	<div class="line" style="position: absolute; width: {wireLength}px; left: 10px; top: 8px; transform: translate({startX}px, {startY}px) translateX({-wireLength/2}px) rotate({wireAngle}rad) translateX({wireLength/2}px);"></div>
+	<div style="text-align: center; position: absolute; width: {wireLength}px; left: 10px; transform: translate({startX}px, {startY}px) translateX({-wireLength/2}px) rotate({wireAngle}rad) translateX({wireLength/2}px) translateY(-20px);">{component.name}</div>
 
-	</div>
 	<Draggable bind:x={startX} bind:y={startY} bounds={bounds} on:moved={() => dispatch("moved")}>
 		<Node />
 	</Draggable>

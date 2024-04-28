@@ -39,8 +39,8 @@
 			let startKey: string = c.startX + "," + c.startY;
 			let endKey: string = c.endX + "," + c.endY;
 
-			circuitGraph.addEdge(startKey, endKey, c.component);
-			circuitGraph.addEdge(endKey, startKey, c.component);
+			circuitGraph.addEdge(startKey, endKey, c.component, true);
+			circuitGraph.addEdge(endKey, startKey, c.component, false);
 		});
 
 		circuitGraph.computeMatrix();
