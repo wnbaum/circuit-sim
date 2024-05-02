@@ -25,18 +25,83 @@ export class CircuitGraph {
 		let edge: Edge = { node: nodeB, component: component, forwards: forwards }
 		let val = this.adj.get(nodeA);
 		if (val) val.push(edge);
-
-		let hash: string = this.hashEdge(nodeA, nodeB);
-		if (component.type == ComponentType.Voltage) {
-			this.voltages.add(hash);
-		}
 	}
 
 	hashEdge(nodeA: string, nodeB: string): string {
 		return [nodeA, nodeB].sort().join(",");
 	}
 
+	exploreWireHelper(node: string, visited: Set<string>, ret: string[]): void {
+		if (visited.has(node)) return;
+		visited.add(node);
+		ret.push(node);
+		this.adj.get(node)!.forEach(edge => {
+			if (!visited.has(edge.node) && edge.component.type == ComponentType.Wire) {
+				this.exploreWireHelper(edge.node, visited, ret);
+			}
+		});
+	}
+
 	computeMatrix(): void {
+		// dissolve wires
+		let visited: Set<string> = new Set<string>();
+		let connectedGroups: string[][] = []
+		this.adj.forEach((edges, node) => {
+			let ret: string[] = [];
+			this.exploreWireHelper(node, visited, ret);
+			if (ret.length > 1) {
+				connectedGroups.push(ret);
+			}
+		});
+
+		connectedGroups.forEach(group => {
+			let combinedNode: string = group[0];
+			let groupSet: Set<string> = new Set(group);
+			let deletion: string[] = [];
+			this.adj.forEach((edges, node) => {
+				// add every combined connection to last node
+				if (groupSet.has(node)) {
+					deletion.push(node);
+					let lastEdges: Edge[] = this.adj.get(combinedNode)!;
+					lastEdges = lastEdges.concat(edges)
+				}
+				// if another node pointing to a node in group, point it to last node
+				edges.forEach(edge => {
+					if (groupSet.has(edge.node)) {
+						edge.node = combinedNode;
+					}
+				})
+			})
+			deletion.forEach(node => {
+				if (node != combinedNode) this.adj.delete(node);
+			})
+		})
+
+		this.adj.forEach((edges, node) => {
+			let newEdges: Edge[] = [];
+			let nodes: Set<string> = new Set<string>();
+			edges.forEach(edge => {
+				if (!nodes.has(edge.node) && edge.node != node) {
+					newEdges.push(edge);
+				}
+				nodes.add(edge.node);
+			})
+			this.adj.set(node, newEdges);
+		})
+
+		console.log(this.adj)
+
+		// find all voltage sources with new matrix
+		this.adj.forEach((edges, node) => {
+			edges.forEach(edge => {
+				let hash: string = this.hashEdge(node, edge.node);
+				if (edge.component.type == ComponentType.Voltage) {
+					this.voltages.add(hash);
+				}
+			})
+		})
+
+		// compute matrix
 		let n: number = this.adj.size; // nodes
 		let m: number = this.voltages.size; // voltage sources
 		
