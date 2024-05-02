@@ -18,6 +18,11 @@
 			type: ComponentType.Capacitor,
 			data: { "capacitance": 5 }
 		},
+		{
+			name: "Wire",
+			type: ComponentType.Wire,
+			data: {}
+		},
 	];
 
 	const dispatch = createEventDispatcher();
