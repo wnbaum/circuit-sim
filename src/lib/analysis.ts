@@ -31,47 +31,61 @@ export class CircuitGraph {
 		return [nodeA, nodeB].sort().join(",");
 	}
 
+	exploreWireHelper(node: string, visited: Set<string>, ret: Set<string>): void {
+		if (visited.has(node)) return;
+		visited.add(node);
+		ret.add(node);
+		this.adj.get(node)!.forEach(edge => {
+			if (!visited.has(edge.node) && edge.component.type == ComponentType.Wire) {
+				this.exploreWireHelper(edge.node, visited, ret);
+			}
+		});
+	}
+
 	computeMatrix(): void {
 		// dissolve wires
-		let wires: boolean = true;
-		while (wires) {
-			wires = false;
-			let nodeA: string = "";
-			let nodeB: string = "";
-			try {
-				this.adj.forEach((edges, node) => {
+		let visited: Set<string> = new Set<string>();
+		let connectedGroups: Set<string>[] = []
+		this.adj.forEach((edges, node) => {
+			let ret: Set<string> = new Set<string>();
+			this.exploreWireHelper(node, visited, ret);
+			if (ret.size > 1) {
+				connectedGroups.push(ret);
+			}
+		});
+
+		// for each connected group, choose a node to merge to
+		// everything not in this group that points to a node in the group must now point to this node
+		// every outward connection from a node in the group to outside the group must be the merge nodes edges
+		// delete not merged nodes in group
+		
+		connectedGroups.forEach(group => {
+			let mergeNode: string = group.values().next().value;
+			this.adj.forEach((edges, node) => {
+				if (!group.has(node)) {
 					edges.forEach(edge => {
-						if (edge.component.type == ComponentType.Wire) {
-							nodeA = node;
-							nodeB = edge.node;
-							throw new Error();
+						if (group.has(edge.node)) {
+							edge.node = mergeNode;
 						}
 					});
-				});
-			} catch (e) {
-				wires = true;
-				// combine two wire edges
-				// add new edges to nodeA (not this wire)
-				console.log(nodeA, nodeB);
-				this.adj.get(nodeB)!.forEach(edge => {
-					if (edge.node != nodeB) { // not this wire
-						this.adj.get(nodeA)!.push(edge);
+				}
+			});
+			let newEdges: Edge[] = [];
+			group.forEach(node => {
+				this.adj.get(node)!.forEach(edge => {
+					if (!group.has(edge.node)) {
+						newEdges.push(edge)
 					}
 				});
-				// connect anything connected to nodeB to nodeA
-				this.adj.forEach((edges, node) => {
-					edges.forEach(edge => {
-						if (edge.node == nodeB) {
-							edge.node == nodeA;
-						}
-					})
-				})
-				// delete nodeB
-				this.adj.delete(nodeB);
-				console.log(this.adj)
-			}
-		}
-
+			});
+			this.adj.set(mergeNode, newEdges);
+			group.forEach(node => {
+				if (node != mergeNode) {
+					this.adj.delete(node);
+				}
+			});
+		});
+		
 		console.log(this.adj)
 
 		// find all voltage sources with new matrix
