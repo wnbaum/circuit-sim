@@ -23,6 +23,11 @@
 			type: ComponentType.Wire,
 			data: {}
 		},
+		{
+			name: "Current Source",
+			type: ComponentType.CurrentSource,
+			data: { "current": 1 }
+		},
 	];
 
 	const dispatch = createEventDispatcher();

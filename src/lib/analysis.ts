@@ -166,6 +166,10 @@ export class CircuitGraph {
 					let index: number = voltageIndexes.get(this.hashEdge(node, edge.node))!;
 					set(Z, n+index, 0, edge.component.data.voltage);
 				}
+				if (edge.component.type == ComponentType.CurrentSource) { // find current sources
+					let index: number = nodeIndexes.get(edge.node)!;
+					set(Z, index, 0, edge.component.data.current * (edge.forwards ? 1 : -1));
+				}
 			})
 		});
 

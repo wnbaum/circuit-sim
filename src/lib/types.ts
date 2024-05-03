@@ -2,7 +2,8 @@ export enum ComponentType {
 	Voltage,
 	Resistor,
 	Capacitor,
-	Wire
+	Wire,
+	CurrentSource
 }
 
 export interface Component {
