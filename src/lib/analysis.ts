@@ -14,7 +14,6 @@ export class CircuitGraph {
 	private nodeIndexes!: Map<string, number>; // initialized in initGraph
 	private voltageIndexes!: Map<string, number>;
 	
-	private startTime!: number;
 	private time!: number; // initialized in initGraph
 
 	private prevX: NDArray | undefined; // used for trapezoidal integration
@@ -137,15 +136,9 @@ export class CircuitGraph {
 			this.voltageIndexes.set(hash, i);
 			i++;
 		});
-
-		this.startTime = Date.now();
-		this.time = 0;
 	}
 
-	tick(): void {
-		let deltaT: number = ((Date.now()-this.startTime) - this.time)/1000.0; // seconds
-		this.time = (Date.now()-this.startTime)/1000.0;
-
+	tick(deltaT: number): void {
 		// compute matrix
 		let n: number = this.adj.size; // nodes
 		let m: number = this.voltages.size; // voltage sources
@@ -271,12 +264,13 @@ export class CircuitGraph {
 
 		// store previous value of X for trapezoidal integration
 		this.prevX = X.copy();
-		console.log(this.prevX.toString())
+		this.time += deltaT;
+		// console.log(this.prevX.toString())
 	}
 
 	reset(): void {
-		this.startTime = Date.now();
 		this.time = 0;
+		this.prevX = undefined;
 		this.adj.forEach((edges, node) => {
 			edges.forEach(edge => {
 				if (edge.component.type == ComponentType.Capacitor && edge.forwards) {

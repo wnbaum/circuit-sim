@@ -59,6 +59,16 @@
 				// 		duration: 0
 				// 	}
 				// }
+				elements: {
+					point:{
+						radius: 0
+					}
+				},
+				plugins: {
+					tooltip: {
+						enabled: false
+					}
+				}
 			};
 
 			let t: number[] = [];
