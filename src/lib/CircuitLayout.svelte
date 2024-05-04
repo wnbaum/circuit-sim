@@ -105,10 +105,11 @@
 			<button on:click={() => resetCircuit()}>Reset</button>
 			<button on:click={() => clearCircuit()}>Clear</button>
 			<div class="widget">
-				Time Scale: <input type="number" bind:value={timeScale}>
+				<span>Time Scale: </span><input bind:value={timeScale}>
 			</div>
 			<div class="widget">
-				Physics Subtick: <input type="number" bind:value={subtick}>
+				<!-- svelte-ignore a11y-label-has-associated-control -->
+				<span>Physics Subtick: </span><input bind:value={subtick}>
 			</div>
 		</div>
 	</div>
@@ -118,15 +119,26 @@
 
 <style>
 	main {
-		border: 1px solid black;
 		flex: var(--flex);
 	}
 
 	.window {
-		border: 1px solid red;
+		background-color: var(--dark-background-primary);
 		position: relative;
 		flex: 1;
+		background-size: 20px 20px; /* Size of each grid square */
+		background-position: 10px 10px;
+		background-image:
+			linear-gradient(to right, var(--dark-background-secondary) 1px, transparent 1px),
+			linear-gradient(to bottom, var(--dark-background-secondary) 1px, transparent 1px);
 	}
+
+	:global(.light) .window {
+        background-color: var(--background-primary);
+		background-image:
+			linear-gradient(to right, var(--background-secondary) 1px, transparent 1px),
+			linear-gradient(to bottom, var(--background-secondary) 1px, transparent 1px);
+    }
 
 	.container {
 		display: flex;
@@ -139,6 +151,51 @@
 		display: flex;
 		flex-direction: column;
 		gap: 20px;
+		width: 200px;
 	}
 
+	button {
+		background: var(--dark-background-primary);
+		outline: none;
+		padding: 10px;
+		border: none;
+		border-radius: 100px;
+		color: inherit;
+		width: 100px;
+		margin-left: auto;
+		margin-right: auto;
+		font-size: inherit;
+		cursor: pointer;
+	}
+
+	:global(.light) button {
+		background: var(--background-primary);
+	}
+
+	input {
+		background: var(--dark-background-primary);
+		border: none;
+		outline: none;
+		font-size: inherit;
+		width: 40px;
+		color: inherit;
+		text-align: right;
+		padding: 8px;
+		border-radius: 8px;
+	}
+
+	:global(.light) input {
+		background: var(--background-primary);
+	}
+
+	.widget {
+		display: flex;
+		justify-content: space-between;
+	}
+
+	.widget span {
+		height: 100%;
+		display: inline-flex;
+  		align-items: center;
+	}
 </style>

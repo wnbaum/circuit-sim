@@ -17,15 +17,16 @@
 		});
 	});
 
-	function updateChart() {
+	export function updateChart() {
 		if (chart) {
 			chart.data = data;
+			chart.options = options;
 			chart.update();
 		}
-		
 	}
 
 	$: data, updateChart();
+	$: options, updateChart();
 </script>
 
 <canvas bind:this={canvas}></canvas>

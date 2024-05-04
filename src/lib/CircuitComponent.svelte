@@ -62,7 +62,11 @@
 	
 	.line {
 		height: 4px;
-		background-color: red;
+		background-color: var(--dark-text-color);
+	}
+	
+	:global(.light) .line {
+		background-color: var(--text-color);
 	}
 
 	.monitor {

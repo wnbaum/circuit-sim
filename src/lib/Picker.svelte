@@ -55,7 +55,7 @@
 		{#each components as component, i}
 			<!-- svelte-ignore a11y-click-events-have-key-events -->
 			<!-- svelte-ignore a11y-no-static-element-interactions -->
-			<div style="border: 1px solid black;" on:click={(e) => pickComponent(component)}>
+			<div class="component" on:click={(e) => pickComponent(component)}>
 				{component.name}
 			</div>
 		{/each}
@@ -64,14 +64,27 @@
 
 <style>
 	main {
-		border: 1px solid black;
 		flex: var(--flex);
 	}
 
 	.picker {
 		margin: 20px;
+		margin-right: 0px;
 		display: flex;
 		flex-direction: column;
-		gap: 10px;
+		gap: 20px;
+	}
+
+	.component {
+		cursor: pointer;
+		padding: 10px;
+		background-color: var(--dark-background-primary);
+		width: calc(100%-20px);
+		border-radius: 100px;
+		text-align: center;
+	}
+
+	:global(.light) .component { 
+		background-color: var(--background-primary);
 	}
 </style>
