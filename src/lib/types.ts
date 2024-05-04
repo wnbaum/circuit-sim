@@ -3,7 +3,8 @@ export enum ComponentType {
 	Resistor,
 	Capacitor,
 	Wire,
-	CurrentSource
+	CurrentSource,
+	Voltmeter
 }
 
 export interface Component {

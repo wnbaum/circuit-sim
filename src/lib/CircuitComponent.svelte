@@ -31,11 +31,21 @@
 	}
 
 	let dispatch = createEventDispatcher();
+
+	function monitor(): void {
+		component.data.monitor = !component.data.monitor;
+		dispatch("monitorToggle");
+	}
 </script>
 
 <main>
 	<div class="line" style="position: absolute; width: {wireLength}px; left: 10px; top: 8px; transform: translate({startX}px, {startY}px) translateX({-wireLength/2}px) rotate({wireAngle}rad) translateX({wireLength/2}px);"></div>
 	<div style="text-align: center; position: absolute; width: {wireLength}px; left: 10px; transform: translate({startX}px, {startY}px) translateX({-wireLength/2}px) rotate({wireAngle}rad) translateX({wireLength/2}px) translateY(-20px);">{component.name}</div>
+	{#if component.data.monitor != undefined}
+		<!-- svelte-ignore a11y-no-static-element-interactions -->
+		<!-- svelte-ignore a11y-click-events-have-key-events -->
+		<div on:click={() => monitor()} class="monitor" style="background-color: {component.data.monitor ? "green" : "gray" }; position: absolute; left: 10px; transform: translate({startX}px, {startY}px) translateX(-5px) rotate({wireAngle}rad) translateX({(wireLength/2)+60}px) translateY(-15px);"></div>
+	{/if}
 
 	<Draggable bind:x={startX} bind:y={startY} bounds={bounds} on:moved={() => dispatch("moved")}>
 		<Node />
@@ -53,5 +63,11 @@
 	.line {
 		height: 4px;
 		background-color: red;
+	}
+
+	.monitor {
+		width: 10px;
+		height: 10px;
+		user-select: none;
 	}
 </style>

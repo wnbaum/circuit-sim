@@ -6,17 +6,17 @@
 		{
 			name: "Battery",
 			type: ComponentType.Voltage,
-			data: { "voltage": 5 }
+			data: { voltage: 5 }
 		},
 		{
 			name: "Resistor",
 			type: ComponentType.Resistor,
-			data: { "resistance": 10 }
+			data: { resistance: 10 }
 		},
 		{
 			name: "Capacitor",
 			type: ComponentType.Capacitor,
-			data: { "capacitance": 5 }
+			data: { capacitance: 5, voltage: 0 }
 		},
 		{
 			name: "Wire",
@@ -26,15 +26,21 @@
 		{
 			name: "Current Source",
 			type: ComponentType.CurrentSource,
-			data: { "current": 1 }
+			data: { current: 1 }
 		},
+		{
+			name: "Voltmeter",
+			type: ComponentType.Voltmeter,
+			data: { voltage: 0, monitor: false },
+			
+		}
 	];
 
 	const dispatch = createEventDispatcher();
 
 	function pickComponent(component: Component): void {
 		dispatch("picked", {
-			component: component,
+			component: JSON.parse(JSON.stringify(component)), // create new component copy (hacky)
 		});
 	}
 </script>
