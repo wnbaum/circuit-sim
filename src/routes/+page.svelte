@@ -18,6 +18,10 @@
 			updateGraphColor("#E9ECEF", "#141622");
         }
     }
+	
+	onMount(() => {
+		updateGraphColor("#E9ECEF", "#141622");
+	})
 
 	function pickedComponent(e: CustomEvent): void {
 		let component: Component = e.detail.component;
@@ -103,6 +107,7 @@
 		display: flex;
 		width: 100%;
 		flex: 1;
+		min-height: 0;
 	}
 
 	:global(.light) .main-window {

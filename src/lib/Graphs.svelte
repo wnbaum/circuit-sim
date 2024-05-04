@@ -38,7 +38,12 @@
 		charts = charts; // trigger Svelte reactivity
 	}
 
+	let graphColor: string;
+	let graphColor2: string;
+
 	export function updateGraphColor(color: string, color2: string): void {
+		graphColor = color;
+		graphColor2 = color2;
 		charts.forEach(chart => {
 			chart.options.scales!.x!.ticks!.color = color;
 			chart.options.scales!.y!.ticks!.color = color;
@@ -52,8 +57,6 @@
 
 	export function resetGraphDisplay(components: Component[]): void {
 		let newCharts: ChartDataOptions[] = [];
-		let color: string = "#E9ECEF";
-		let color2: string = "#292D3E";
 		components.forEach(c => {
 			const options: ChartOptions = {
 				scales: {
@@ -61,19 +64,19 @@
 						type: "linear",
 						position: "bottom",
 						ticks: {
-							color: color,
+							color: graphColor,
 						},
 						grid: {
-							color: color2
+							color: graphColor2
 						}
 					},
 					y: {
 						beginAtZero: true,
 						ticks: {
-							color: color,
+							color: graphColor,
 						},
 						grid: {
-							color: color2
+							color: graphColor2
 						}
 					}
 				},
@@ -100,7 +103,7 @@
 					},
 					title: {
 						display: true,
-						color: color,
+						color: graphColor,
 						text: c.name
 					}
 				},
@@ -138,9 +141,27 @@
 		flex: var(--flex);
 		padding: 20px;
 		background-color: var(--dark-background-tertiary);
+		display: flex;
+		flex-direction: column;
+		gap: 20px;
+		overflow-y: auto;
 	}
 
 	:global(.light) main {
 		background-color: var(--background-tertiary);
 	}
+
+	main::-webkit-scrollbar {
+		width: 10px;
+	}
+
+	main::-webkit-scrollbar-thumb {
+		background-color: var(--dark-background-primary);
+		border-radius: 5px;
+	}
+
+	:global(.light) main::-webkit-scrollbar-thumb {
+		background-color: var(--background-primary);
+	}
+
 </style>
