@@ -26,7 +26,7 @@
 	function addChartDataPoint(chart: ChartDataOptions, t: number, y: number): void {
 			chart.data.datasets[0].data.push(y);
 			chart.data.labels!.push(t);
-			console.log(t, y)
+			// console.log(t, y)
 	}
 
 	export function updateGraphTick(time: number): void {

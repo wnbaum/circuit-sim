@@ -11,12 +11,17 @@
 		{
 			name: "Resistor",
 			type: ComponentType.Resistor,
-			data: { resistance: 10 }
+			data: { resistance: 4 }
 		},
 		{
 			name: "Capacitor",
 			type: ComponentType.Capacitor,
-			data: { capacitance: 5, voltage: 0 }
+			data: { capacitance: 1, voltage: 0 }
+		},
+		{
+			name: "Inductor",
+			type: ComponentType.Inductor,
+			data: { inductance: 50, current: 0 }
 		},
 		{
 			name: "Wire",

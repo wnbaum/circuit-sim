@@ -41,6 +41,20 @@ export class CircuitGraph {
 		return [nodeA, nodeB].sort().join(",");
 	}
 
+	getVoltage(nodeA: string, nodeB: string, X: NDArray): number {
+		let aIndex: number = this.nodeIndexes.get(nodeA)!;
+		let bIndex: number = this.nodeIndexes.get(nodeB)!;
+		let aVoltage: number = 0;
+		let bVoltage: number = 0;
+		if (aIndex > 0) {
+			aVoltage = X.get(aIndex-1, 0);
+		}
+		if (bIndex > 0) {
+			bVoltage = X.get(bIndex-1, 0);
+		}
+		return bVoltage - aVoltage;
+	}
+
 	exploreWireHelper(node: string, visited: Set<string>, ret: Set<string>): void {
 		if (visited.has(node)) return;
 		visited.add(node);
@@ -173,7 +187,6 @@ export class CircuitGraph {
 		// solve for X matrix, need Z
 
 		let Z: NDArray = zeros(n+m, 1);
-		// ignore current sources for now
 
 		this.adj.forEach((edges, node) => {
 			edges.forEach(edge => {
@@ -181,7 +194,7 @@ export class CircuitGraph {
 					let index: number = this.voltageIndexes.get(this.hashVoltage(node, edge.node))!;
 					set(Z, n+index, 0, edge.component.data.voltage);
 				}
-				if (edge.component.type == ComponentType.CurrentSource) { // find current sources
+				if (edge.component.type == ComponentType.CurrentSource || edge.component.type == ComponentType.Inductor) { // find current sources
 					let index: number = this.nodeIndexes.get(edge.node)!;
 					set(Z, index, 0, edge.component.data.current * (edge.forwards ? 1 : -1));
 				}
@@ -210,7 +223,7 @@ export class CircuitGraph {
 
 		// first n-1 entries are solved voltages at each node (excluding ground which is 0), last m entries are solved currents through each voltages source
 
-		console.log(X.toString());
+		// console.log(X.toString());
 
 		// now compute changes in dynamic components
 		
@@ -221,9 +234,17 @@ export class CircuitGraph {
 				if (edge.component.type == ComponentType.Capacitor && edge.forwards) { // capacitors are basically dynamic voltage sources
 					let index: number = this.voltageIndexes.get(this.hashVoltage(node, edge.node))!;
 					let currentOverVoltageSource: number = X.get((n-1)+index, 0); // get current. n-1 because we have ground node row removed at this point
-					if (edge.component.type == ComponentType.Capacitor) {
-						edge.component.data.voltage += (currentOverVoltageSource/edge.component.data.capacitance)*deltaT;
-					}
+					edge.component.data.voltage += (currentOverVoltageSource/edge.component.data.capacitance)*deltaT;
+				}
+			})
+		})
+
+		// inductors dI/dt = V/L
+		this.adj.forEach((edges, node) => {
+			edges.forEach(edge => {
+				if (edge.component.type == ComponentType.Inductor && edge.forwards) { // inductors are basically dynamic current sources
+					let voltageOverInductor: number = this.getVoltage(edge.node, node, X); // flip node and edge.node to get proper voltage direction
+					edge.component.data.current += (voltageOverInductor/edge.component.data.inductance)*deltaT; 
 				}
 			})
 		})
@@ -232,17 +253,7 @@ export class CircuitGraph {
 		this.adj.forEach((edges, node) => {
 			edges.forEach(edge => {
 				if (edge.component.type == ComponentType.Voltmeter && edge.forwards) {
-					let aIndex: number = this.nodeIndexes.get(node)!;
-					let bIndex: number = this.nodeIndexes.get(edge.node)!;
-					let aVoltage: number = 0;
-					let bVoltage: number = 0;
-					if (aIndex > 0) {
-						aVoltage = X.get(aIndex-1, 0);
-					}
-					if (bIndex > 0) {
-						bVoltage = X.get(bIndex-1, 0);
-					}
-					edge.component.data.voltage = bVoltage - aVoltage;
+					edge.component.data.voltage = this.getVoltage(node, edge.node, X);
 				}
 			})
 		})
@@ -255,6 +266,9 @@ export class CircuitGraph {
 			edges.forEach(edge => {
 				if (edge.component.type == ComponentType.Capacitor && edge.forwards) {
 					edge.component.data.voltage = 0;
+				}
+				if (edge.component.type == ComponentType.Inductor && edge.forwards) {
+					edge.component.data.current = 0;
 				}
 			})
 		})

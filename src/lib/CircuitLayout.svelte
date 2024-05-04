@@ -51,7 +51,7 @@
 		tickInterval = setInterval(() => {
 			circuitGraph.tick();
 			onCircuitTick(circuitGraph.getTime());
-		}, 100); // 10ms, i.e. try 100fps max
+		}, 10); // 10ms, i.e. try 100fps max
 
 		resetGraphs();
 	}
