@@ -79,7 +79,7 @@
 		cursor: pointer;
 		padding: 10px;
 		background-color: var(--dark-background-primary);
-		width: calc(100%-20px);
+		width: calc(100% - 20px);
 		border-radius: 100px;
 		text-align: center;
 	}
