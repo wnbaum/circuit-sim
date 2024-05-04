@@ -7,10 +7,6 @@ export interface Edge {
 	forwards: boolean;
 }
 
-function wireType(type: ComponentType): boolean {
-	return type == ComponentType.Wire || type == ComponentType.Voltmeter;
-}
-
 export class CircuitGraph {
 	private adj: Map<string, Edge[]>
 	private voltages: Set<string>;
