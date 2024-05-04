@@ -143,7 +143,7 @@ export class CircuitGraph {
 		this.adj.forEach((edges, node) => {
 			let conductance: number = 0;
 			edges.forEach(edge => {
-				if (edge.component.type == ComponentType.Resistor) {
+				if (edge.component.type == ComponentType.Resistor) { // other components have infinite resistance (hence the 0 conductance)
 					conductance += 1/edge.component.data.resistance;
 
 					let from = this.nodeIndexes.get(node)!;
