@@ -55,8 +55,38 @@
 		{#each components as component, i}
 			<!-- svelte-ignore a11y-click-events-have-key-events -->
 			<!-- svelte-ignore a11y-no-static-element-interactions -->
-			<div class="component" on:click={(e) => pickComponent(component)}>
-				{component.name}
+			<div class="component custombutton" on:click={(e) => pickComponent(component)}>
+				<span>{component.name}</span>
+				{#if component.type == ComponentType.Voltage}
+					<div>
+						<input placeholder="Voltage" bind:value={component.data.voltage} on:click={e => e.stopPropagation()}>
+						<div class="unit">V</div>
+					</div>
+				{/if}
+				{#if component.type == ComponentType.Resistor}
+				<div>
+					<input placeholder="Resistance" bind:value={component.data.resistance} on:click={e => e.stopPropagation()}>
+					<div class="unit">Ω</div>
+				</div>
+				{/if}
+				{#if component.type == ComponentType.Capacitor}
+				<div>
+					<input placeholder="Capacitance" bind:value={component.data.capacitance} on:click={e => e.stopPropagation()}>
+					<div class="unit">F</div>
+				</div>
+				{/if}
+				{#if component.type == ComponentType.Inductor}
+				<div>
+					<input placeholder="Inductance" bind:value={component.data.inductance} on:click={e => e.stopPropagation()}>
+					<div class="unit">H</div>
+				</div>
+				{/if}
+				{#if component.type == ComponentType.CurrentSource}
+				<div>
+					<input placeholder="Current" bind:value={component.data.current} on:click={e => e.stopPropagation()}>
+					<div class="unit">A</div>
+				</div>
+				{/if}
 			</div>
 		{/each}
 	</div>
@@ -78,13 +108,56 @@
 	.component {
 		cursor: pointer;
 		padding: 10px;
+		padding-left: 20px;
+		padding-right: 20px;
 		background-color: var(--dark-background-primary);
-		width: calc(100% - 20px);
+		width: calc(100% - 40px);
 		border-radius: 100px;
 		text-align: center;
+		transition: background-color 0.2s linear, color 0.1s ease-out;
+		display: flex;
+		justify-content: space-between;
 	}
 
 	:global(.light) .component { 
 		background-color: var(--background-primary);
+	}
+
+	.component:hover {
+		background-color: var(--dark-text-color);
+		color: var(--text-color);
+	}
+	:global(.light) .component:hover { 
+		background-color: var(--text-color);
+		color: var(--dark-text-color);
+	}
+
+	input {
+		background: var(--dark-background-secondary);
+		border: none;
+		outline: none;
+		font-size: inherit;
+		width: 30px;
+		color: inherit;
+		text-align: right;
+		padding: 8px;
+		border-radius: 8px;
+		color: var(--dark-text-color);
+	}
+
+	:global(.light) input {
+		background: var(--background-secondary);
+		color: var(--text-color);
+	}
+
+	.component span {
+		height: auto;
+		display: inline-flex;
+  		align-items: center;
+	}
+
+	.component .unit {
+		width: 10px;
+		display: inline-block;
 	}
 </style>

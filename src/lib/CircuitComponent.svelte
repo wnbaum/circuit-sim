@@ -40,11 +40,11 @@
 
 <main>
 	<div class="line" style="position: absolute; width: {wireLength}px; left: 10px; top: 8px; transform: translate({startX}px, {startY}px) translateX({-wireLength/2}px) rotate({wireAngle}rad) translateX({wireLength/2}px);"></div>
-	<div style="text-align: center; position: absolute; width: {wireLength}px; left: 10px; transform: translate({startX}px, {startY}px) translateX({-wireLength/2}px) rotate({wireAngle}rad) translateX({wireLength/2}px) translateY(-20px);">{component.name}</div>
+	<div style="pointer-events: none; text-align: center; position: absolute; width: {wireLength}px; left: 10px; transform: translate({startX}px, {startY}px) translateX({-wireLength/2}px) rotate({wireAngle}rad) translateX({wireLength/2}px) translateY(-20px);">{component.name}</div>
 	{#if component.data.monitor != undefined}
 		<!-- svelte-ignore a11y-no-static-element-interactions -->
 		<!-- svelte-ignore a11y-click-events-have-key-events -->
-		<div on:click={() => monitor()} class="monitor" style="background-color: {component.data.monitor ? "green" : "gray" }; position: absolute; left: 10px; transform: translate({startX}px, {startY}px) translateX(-5px) rotate({wireAngle}rad) translateX({(wireLength/2)+60}px) translateY(-15px);"></div>
+		<div on:click={() => monitor()} class="monitor" style="background-color: {component.data.monitor ? "green" : "" }; position: absolute; left: 10px; transform: translate({startX}px, {startY}px) translateX(-5px) rotate({wireAngle}rad) translateX({(wireLength/2)+60}px) translateY(-14px);"></div>
 	{/if}
 
 	<Draggable bind:x={startX} bind:y={startY} bounds={bounds} on:moved={() => dispatch("moved")}>
@@ -73,5 +73,13 @@
 		width: 10px;
 		height: 10px;
 		user-select: none;
+		border-radius: 5px;
+		border: 1px solid var(--dark-text-color);
+		background-color: var(--dark-background-primary);
+		cursor: pointer;
+	}
+	:global(.light) .monitor {
+		border: 1px solid var(--text-color);
+		background-color: var(--background-primary);
 	}
 </style>

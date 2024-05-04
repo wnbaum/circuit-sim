@@ -17,7 +17,9 @@
 	let components: DisplayComponent[] = [];
 
 	export function createComponent(component: Component): void {
-		components.push({component: component, startX: 0, startY: 0, endX: 0, endY: 0})
+		let x: number = Math.round(Math.random()*10)*20;
+		let y: number = Math.round(Math.random()*10)*20;
+		components.push({component: component, startX: x, startY: y, endX: x+100, endY: y})
 		components = components;
 	}
 
@@ -55,7 +57,8 @@
 		let delay: number = 0.01; // seconds
 		tickInterval = setInterval(() => {
 			for (let i = 0; i < subtick; i++) {
-				circuitGraph.tick(timeScale*delay/subtick);
+				let pauseVal: number = pause ? 0 : 1;
+				circuitGraph.tick(pauseVal*timeScale*delay/subtick);
 			}
 			onCircuitTick(circuitGraph.getTime()); // graph every tick
 		}, delay*1000); // 10ms, i.e. try 100fps max
@@ -70,10 +73,16 @@
 
 	function clearCircuit() {
 		components = [];
-		circuitGraph.initGraph();
+
+		if (circuitGraph) {
+			circuitGraph.initGraph();
+		}
+		
 		clearInterval(tickInterval);
 		resetGraphs();
 	}
+
+	let pause: boolean = false;
 
 	function onCircuitTick(time: number) {
 		dispatch("tick", { time: time });
@@ -104,6 +113,7 @@
 		<div class="widgets">
 			<button on:click={() => resetCircuit()}>Reset</button>
 			<button on:click={() => clearCircuit()}>Clear</button>
+			<button on:click={() => pause = !pause}>{pause ? "Play" : "Pause"}</button>
 			<div class="widget">
 				<span>Time Scale: </span><input bind:value={timeScale}>
 			</div>
@@ -166,10 +176,20 @@
 		margin-right: auto;
 		font-size: inherit;
 		cursor: pointer;
+		transition: background-color 0.2s linear, color 0.1s ease-out;
 	}
 
 	:global(.light) button {
-		background: var(--background-primary);
+		background-color: var(--background-primary);
+	}
+
+	button:hover {
+		background-color: var(--dark-text-color);
+		color: var(--text-color);
+	}
+	:global(.light) button:hover { 
+		background-color: var(--text-color);
+		color: var(--dark-text-color);
 	}
 
 	input {

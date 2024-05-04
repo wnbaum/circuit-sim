@@ -64,7 +64,7 @@
 	</div>
 	
 	<div class="main-window">
-		<Picker on:picked={pickedComponent} --flex={"0 0 200px"}/>
+		<Picker on:picked={pickedComponent} --flex={"0 0 250px"}/>
 		<CircuitLayout on:tick={circuitTick} on:resetGraphs={resetGraphs} bind:createComponent={createComponent} --flex={"2"}/>
 		<Graphs bind:updateGraphTick={updateGraphTick} bind:updateGraphColor={updateGraphColor} bind:resetGraphDisplay={resetGraphDisplay} --flex={"1"}/>
 	</div>
@@ -146,5 +146,4 @@
 	a {
 		color: inherit;
 	}
-
 </style>

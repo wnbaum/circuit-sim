@@ -27,12 +27,61 @@
 
 	$: data, updateChart();
 	$: options, updateChart();
+
+	function download() {
+		const rows = [
+			chart.data.labels,
+			chart.data.datasets[0].data
+		];
+
+		let floatRows: number[][] = []
+
+		rows.forEach(row => {
+			let newRow: number[] = [];
+			row?.forEach(e => {
+				newRow.push(parseFloat("" + e));
+			});
+			floatRows.push(newRow);
+		});
+
+		let csvContent = "data:text/csv;charset=utf-8," + floatRows.map(e => e.join(",")).join("\n");
+
+		var encodedUri = encodeURI(csvContent);
+		window.open(encodedUri);
+	}
 </script>
 
-<canvas bind:this={canvas}></canvas>
+<main>
+	<!-- svelte-ignore a11y-click-events-have-key-events -->
+	<!-- svelte-ignore a11y-no-static-element-interactions -->
+	<div class="dl" on:click={e => {download()}}>
+	</div>
+	<canvas bind:this={canvas}></canvas>
+</main>
+
 
 <style>
+	main {
+		position: relative;
+	}
+
 	canvas {
 		max-width: 100%;
+	}
+
+	.dl {
+		position: absolute;
+		right: 20px;
+		top: 0px;
+		height: 30px;
+		width: 30px;
+		background-image: url("$lib/assets/download.svg");
+		cursor: pointer;
+		background-size: 30px;
+		filter: invert();
+	}
+
+	:global(.light) .dl {
+		filter: none;
 	}
 </style>
