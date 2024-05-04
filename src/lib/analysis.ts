@@ -17,6 +17,8 @@ export class CircuitGraph {
 	private startTime!: number;
 	private time!: number; // initialized in initGraph
 
+	private prevX: NDArray | undefined; // used for trapezoidal integration
+
 	constructor() {
 		this.adj = new Map<string, Edge[]>();
 		this.voltages = new Set<string>();
@@ -225,30 +227,6 @@ export class CircuitGraph {
 
 		// console.log(X.toString());
 
-		// now compute changes in dynamic components
-		
-		// capacitors dV/dt = I/C
-		let voltageHashes: string[] = Array.from(this.voltages);
-		this.adj.forEach((edges, node) => {
-			edges.forEach(edge => {
-				if (edge.component.type == ComponentType.Capacitor && edge.forwards) { // capacitors are basically dynamic voltage sources
-					let index: number = this.voltageIndexes.get(this.hashVoltage(node, edge.node))!;
-					let currentOverVoltageSource: number = X.get((n-1)+index, 0); // get current. n-1 because we have ground node row removed at this point
-					edge.component.data.voltage += (currentOverVoltageSource/edge.component.data.capacitance)*deltaT;
-				}
-			})
-		})
-
-		// inductors dI/dt = V/L
-		this.adj.forEach((edges, node) => {
-			edges.forEach(edge => {
-				if (edge.component.type == ComponentType.Inductor && edge.forwards) { // inductors are basically dynamic current sources
-					let voltageOverInductor: number = this.getVoltage(edge.node, node, X); // flip node and edge.node to get proper voltage direction
-					edge.component.data.current += (voltageOverInductor/edge.component.data.inductance)*deltaT; 
-				}
-			})
-		})
-
 		// compute voltmeter voltages
 		this.adj.forEach((edges, node) => {
 			edges.forEach(edge => {
@@ -257,6 +235,43 @@ export class CircuitGraph {
 				}
 			})
 		})
+
+		// now compute changes in dynamic components
+		
+		// only compute changes after first iteration for trapezoidal integration
+		if (this.prevX) {
+			// capacitors dV/dt = I/C
+			let voltageHashes: string[] = Array.from(this.voltages);
+			this.adj.forEach((edges, node) => {
+				edges.forEach(edge => {
+					if (edge.component.type == ComponentType.Capacitor && edge.forwards) { // capacitors are basically dynamic voltage sources
+						let index: number = this.voltageIndexes.get(this.hashVoltage(node, edge.node))!;
+						let prevCurrentOverVoltageSource: number = this.prevX!.get((n-1)+index, 0);
+						let currentOverVoltageSource: number = X.get((n-1)+index, 0); // get current. n-1 because we have ground node row removed at this point
+						let a: number = prevCurrentOverVoltageSource/edge.component.data.capacitance;
+						let b: number = currentOverVoltageSource/edge.component.data.capacitance;
+						edge.component.data.voltage += (a+b)*deltaT*0.5; // trapezoid 
+					}
+				})
+			})
+
+			// inductors dI/dt = V/L
+			this.adj.forEach((edges, node) => {
+				edges.forEach(edge => {
+					if (edge.component.type == ComponentType.Inductor && edge.forwards) { // inductors are basically dynamic current sources
+						let prevVoltageOverInductor: number = this.getVoltage(edge.node, node, this.prevX!);
+						let voltageOverInductor: number = this.getVoltage(edge.node, node, X); // flip node and edge.node to get proper voltage direction
+						let a: number = prevVoltageOverInductor/edge.component.data.inductance;
+						let b: number = voltageOverInductor/edge.component.data.inductance;
+						edge.component.data.current += (a+b)*deltaT*0.5; // trapezoid 
+					}
+				})
+			})
+		}
+
+		// store previous value of X for trapezoidal integration
+		this.prevX = X.copy();
+		console.log(this.prevX.toString())
 	}
 
 	reset(): void {
