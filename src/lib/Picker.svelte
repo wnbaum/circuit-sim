@@ -9,6 +9,11 @@
 			data: { voltage: 5 }
 		},
 		{
+			name: "Alternator",
+			type: ComponentType.Alternator,
+			data: { max_voltage: 5, voltage: 0 }
+		},
+		{
 			name: "Resistor",
 			type: ComponentType.Resistor,
 			data: { resistance: 4 }
@@ -60,6 +65,12 @@
 				{#if component.type == ComponentType.Voltage}
 					<div>
 						<input placeholder="Voltage" bind:value={component.data.voltage} on:click={e => e.stopPropagation()}>
+						<div class="unit">V</div>
+					</div>
+				{/if}
+				{#if component.type == ComponentType.Alternator}
+					<div>
+						<input placeholder="Alternator" bind:value={component.data.max_voltage} on:click={e => e.stopPropagation()}>
 						<div class="unit">V</div>
 					</div>
 				{/if}

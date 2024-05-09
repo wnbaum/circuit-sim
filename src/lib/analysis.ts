@@ -56,6 +56,10 @@ export class CircuitGraph {
 		return bVoltage - aVoltage;
 	}
 
+	isVoltageType(type: ComponentType): boolean {
+		return type == ComponentType.Voltage || type == ComponentType.Capacitor || type == ComponentType.Alternator;
+	}
+
 	exploreWireHelper(node: string, visited: Set<string>, ret: Set<string>): void {
 		if (visited.has(node)) return;
 		visited.add(node);
@@ -116,7 +120,7 @@ export class CircuitGraph {
 		// find all voltage sources with new matrix
 		this.adj.forEach((edges, node) => {
 			edges.forEach(edge => {
-				if ((edge.component.type == ComponentType.Voltage || edge.component.type == ComponentType.Capacitor) && edge.forwards) { // capacitors are basically dynamic voltage sources
+				if (this.isVoltageType(edge.component.type) && edge.forwards) {
 					let hash: string = this.hashVoltage(node, edge.node);
 					this.voltages.add(hash);
 				}
@@ -167,7 +171,7 @@ export class CircuitGraph {
 
 		this.adj.forEach((edges, node) => {
 			edges.forEach(edge => {
-				if (edge.component.type == ComponentType.Voltage || edge.component.type == ComponentType.Capacitor) {
+				if (this.isVoltageType(edge.component.type)) {
 					let index: number = this.voltageIndexes.get(this.hashVoltage(node, edge.node))!;
 
 					set(A, this.nodeIndexes.get(node)!, n+index, edge.forwards ? -1 : 1); // if voltage is forwards, we are connected to negative
@@ -185,7 +189,7 @@ export class CircuitGraph {
 
 		this.adj.forEach((edges, node) => {
 			edges.forEach(edge => {
-				if ((edge.component.type == ComponentType.Voltage || edge.component.type == ComponentType.Capacitor) && edge.forwards) { // find voltage sources
+				if (this.isVoltageType(edge.component.type) && edge.forwards) { // find voltage sources
 					let index: number = this.voltageIndexes.get(this.hashVoltage(node, edge.node))!;
 					set(Z, n+index, 0, edge.component.data.voltage);
 				}
@@ -225,6 +229,15 @@ export class CircuitGraph {
 			edges.forEach(edge => {
 				if (edge.component.type == ComponentType.Voltmeter && edge.forwards) {
 					edge.component.data.voltage = this.getVoltage(node, edge.node, X);
+				}
+			})
+		})
+
+		// update alternator voltage
+		this.adj.forEach((edges, node) => {
+			edges.forEach(edge => {
+				if (edge.component.type == ComponentType.Alternator && edge.forwards) {
+					edge.component.data.voltage = Math.sin(this.time*Math.PI)*edge.component.data.max_voltage;
 				}
 			})
 		})
